@@ -5,6 +5,7 @@ import java.util.List;
 public class Pirate {
     private String name;
     private List<Integer> preferences;
+    private  int objectsAttibuated;
 
     public Pirate() {
     }
@@ -23,5 +24,13 @@ public class Pirate {
 
     public void setPreferences(List<Integer> preferences) {
         this.preferences = preferences;
+    }
+
+    public int getObjectsAttibuated() {
+        return objectsAttibuated;
+    }
+
+    public void setObjectsAttibuated(int objectsAttibuated) {
+        this.objectsAttibuated = objectsAttibuated;
     }
 }

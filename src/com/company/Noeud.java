@@ -22,6 +22,9 @@ public class Noeud {
         preferences.add(pref);
     }
 
+    public List<Integer> getPreferences() {
+        return preferences;
+    }
 
     @Override
     public String toString() {

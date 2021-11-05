@@ -47,7 +47,7 @@ public class Graphe {
 
     }
 
-    public Noeud getNoeud(int n) {
+    public Noeud getNoeud(String n) {
         //recherche l'élément dans la liste
 
         return (this.getHmap().get(n));
