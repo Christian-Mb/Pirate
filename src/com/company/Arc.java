@@ -2,11 +2,11 @@ package com.company;
 
 
 public class Arc {
-    private Noeud	source;
-    private	Noeud	cible;
+    private Pirate source;
+    private Pirate cible;
 
 
-    public Arc(Noeud source, Noeud cible) {
+    public Arc(Pirate source, Pirate cible) {
         super();
         this.source = source;
         this.cible = cible;
@@ -19,19 +19,19 @@ public class Arc {
         return "Arc [source=" + source.getId() + ", cible=" + cible.getId() + "]";
     }
 
-    public Noeud getSource() {
+    public Pirate getSource() {
         return source;
     }
 
-    public void setSource(Noeud source) {
+    public void setSource(Pirate source) {
         this.source = source;
     }
 
-    public Noeud getCible() {
+    public Pirate getCible() {
         return cible;
     }
 
-    public void setCible(Noeud cible) {
+    public void setCible(Pirate cible) {
         this.cible = cible;
     }
 

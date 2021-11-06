@@ -1,0 +1,15 @@
+pirate(1).
+pirate(2).
+pirate(3).
+pirate(4).
+objet(o1).
+objet(o2).
+objet(o3).
+objet(o4).
+deteste(1,2).
+deteste(1,4).
+deteste(2,4).
+preferences(1,o1,o2,o3,o4).
+preferences(2,o2,o1,o4,o3).
+preferences(3,o3,o1,o4,o2).
+preferences(4,o2,o3,o4,o1).

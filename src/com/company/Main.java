@@ -1,8 +1,7 @@
 package com.company;
 
+import java.io.*;
 import java.util.*;
-
-import java.util.Scanner;
 
 public class Main {
 
@@ -10,117 +9,270 @@ public class Main {
         return txt.split("-")[index];
     }
 
+    public static String splitString(String txt, int index, String separator) {
+        return txt.split(separator)[index];
+    }
+
+    public static Graphe exchangeObject(Graphe monGraph, String choice) {
+
+        System.out.println("Choice" + choice);
+        System.out.println("A" + monGraph);
+
+        Pirate A = monGraph.getPirate(toString(choice, 0));
+        Pirate B = monGraph.getPirate(toString(choice, 1));
+        String temp = A.getObjectsAttibuated();
+        A.setObjectsAttibuated(B.getObjectsAttibuated());
+        B.setObjectsAttibuated(temp);
+
+
+        for (Map.Entry mapentry : monGraph.getHmap().entrySet()) {
+
+            Pirate pirate = (Pirate) mapentry.getValue();
+
+            System.out.println(pirate.getId() + " : " + pirate.getObjectsAttibuated());
+        }
+        System.out.println("B" + monGraph);
+        return monGraph;
+    }
+
+
+    public static int calculateCost(Graphe monGraph) {
+        int cost = 0;
+
+        for (Map.Entry mapentry : monGraph.getHmap().entrySet()) {
+
+            Pirate pirate = (Pirate) mapentry.getValue();
+
+            if (!Objects.equals(pirate.getObjectsAttibuated(), pirate.getPreferences().get(0))) {
+                if (!pirate.getSucc().isEmpty()) {
+                    for (Arc arc : pirate.getSucc()) {
+                        Pirate p = arc.getCible();
+                        if (Objects.equals(p.getObjectsAttibuated(), pirate.getPreferences().get(0))) {
+                            cost++;
+                        }
+                    }
+                }
+            }
+
+
+        }
+
+        return cost;
+    }
+
+    public static Graphe automatisation(Graphe monGraph) {
+
+        int i = 0;
+        int k = monGraph.getPirates().size();
+
+        Graphe A = solutionNaive(monGraph);
+        int a = calculateCost(A);
+
+        System.out.println("naive solution : " + A);
+
+        while (i < k) {
+
+            Pirate pirate = monGraph.getPirates().get(new Random().nextInt(k));
+
+            if (!pirate.getSucc().isEmpty()) {
+                Pirate neighbor = pirate.getSucc().get(0).getCible();
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(pirate.getId()).append("-").append(pirate.getSucc().get(0).getCible().getId());
+
+
+                Graphe C = exchangeObject(A, sb.toString());
+
+                int b = calculateCost(C);
+
+                System.out.println("cost : " + a + " - " + b);
+
+                if (calculateCost(A) > calculateCost(C)) {
+                    A = C;
+                }
+                i++;
+            }
+        }
+        return A;
+    }
+
+
+    public static Graphe solutionNaive(Graphe monGraph) {
+        List<String> attribuatedObjects = new ArrayList<>();
+
+        for (Map.Entry mapentry : monGraph.getHmap().entrySet()) {
+
+            Pirate pirate = (Pirate) mapentry.getValue();
+
+            if (attribuatedObjects.isEmpty()) {
+                String objects = pirate.getPreferences().get(0);
+                attribuatedObjects.add(objects);
+                pirate.setObjectsAttibuated(objects);
+
+            } else {
+                List<String> test = pirate.getPreferences();
+
+                for (String k : test) {
+
+                    for (int i = 0; i < attribuatedObjects.size(); i++) {
+                        if (!attribuatedObjects.contains(k) && pirate.getObjectsAttibuated().isEmpty()) {
+                            pirate.setObjectsAttibuated(k);
+                            attribuatedObjects.add(k);
+                        }
+                    }
+
+                }
+            }
+
+        }
+        return monGraph;
+    }
+
+    public static void menu2(Graphe monGraph) {
+
+        boolean menuu = false;
+
+        while (menuu == false) {
+            System.out.println("1) échanger objets \n 2) afficher coût \n 3) fin");
+
+            Scanner scanner1 = new Scanner(System.in);
+            int c = 0;
+            while (c != 1 && c != 2 && c != 3) {
+                System.out.println("Choisir 1 ou 2 ou 3");
+                c = scanner1.nextInt();
+            }
+
+            switch (c) {
+
+                case 1:
+                    System.out.println("Entrez le couple de pirates dont vous souhaitez echanger les objets. Exemple: A-B");
+                    Scanner sc = new Scanner(System.in);
+                    String couple = sc.nextLine();
+                    exchangeObject(monGraph, couple);
+
+                    break;
+                case 2:
+                    //calculer le cout de la solution actuelle
+                    System.out.println("Le coût est de : " + calculateCost(monGraph));
+                    break;
+
+                case 3:
+
+                    menuu = true;
+                    break;
+            }
+        }
+
+    }
+
+    public static String separator(String line) {
+        String split = splitString(line, 1, "\\(");
+        return splitString(split, 0, "\\)");
+    }
+
+    public static Graphe generateGraph(String filename) {
+        try {
+            Scanner sc = new Scanner(new File(filename));
+            Graphe monGraph = new Graphe();
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+
+                if (line.startsWith("pirate")) {
+                    monGraph.addPirate(separator(line));
+
+                } else if (line.startsWith("objet")) {
+                    monGraph.addObject(separator(line));
+                } else if (line.startsWith("deteste")) {
+                    monGraph.addArc(splitString(separator(line), 0, ","), splitString(separator(line), 1, ","));
+                } else {
+                    //preférences
+                    String lineToSerialize = separator(line);
+                    String[] prefs = lineToSerialize.split(",");
+                    Pirate a = monGraph.getPirate(prefs[0]);
+                    for (int i = 1; i < prefs.length; i++) {
+                        a.setPreferences(prefs[i]);
+                    }
+                }
+            }
+
+            return monGraph;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void menu(Graphe graphe) {
+
+        automatisation(graphe);
+        System.out.println("\nLa solution automatique a été appliquée \n Pour récupérer les données sélectionner l'option sauvegarde");
+    }
+
+
+    public static void saveResult(Graphe graphe) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Entrer un nom de fichier\n");
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(sc.nextLine() + ".txt"));
+
+            for (Pirate pirate : graphe.getPirates()) {
+                writer.write(pirate.getId() + " : " + pirate.getObjectsAttibuated() + "\n");
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public static void main(String[] args) {
 
-        Scanner sc = new Scanner(System.in);
-        int n;
-        System.out.println("entrer un nombre de pirate n inferieur à 26 ");
-        n = sc.nextInt();
+        System.out.println("Initialisation du graphe ...\n");
 
-        Graphe monGraph = new Graphe(n);
+        Graphe monGraph = generateGraph("test.txt");
 
-        System.out.println("1) Ajouter une relation \n 2) Ajouter des préférences \n 3) fin");
+        System.out.println("Graphe initialisé\n");
 
-        Scanner sc2 = new Scanner(System.in);
+        boolean menu = false;
 
-        System.out.println("Choisir 1 ou 2 ou 3");
+        while (menu == false) {
+            System.out.println("1) Résolution automatique \n2) Résolution manuelle \n3)Sauvegarde \n4) fin");
 
-        int choice = 0;
+            Scanner sc = new Scanner(System.in);
 
-        while (choice != 1 && choice != 2 && choice != 3) {
-            choice = sc.nextInt();
+            System.out.println("\nChoisir 1, 2, 3 ou 4");
 
-        }
-        System.out.println(choice);
+            int choice = 0;
 
-        switch (choice) {
-            case 1:
-                System.out.println("Donner le nombre de COUPLE de pirates qui ne s'aiment pas");
-                Scanner sc3 = new Scanner(System.in);
-                int nbr = sc3.nextInt();
-                Scanner sc4 = new Scanner(System.in);
-                System.out.println("Entrer le couple de pirates. Exemple: A-B");
+            while (choice != 1 && choice != 2 && choice != 3 && choice != 4) {
+                choice = sc.nextInt();
 
-                for (int i = 0; i < nbr; i++) {
-                    String couple = sc4.nextLine();
-                    monGraph.addArc(toString(couple, 0), toString(couple, 1));
-                }
-                System.out.println("1) Ajouter une relation \n 2) Ajouter des préférences \n 3) fin");
-                //revenir au menu precédent.
-                break;
-            case 2:
-                System.out.println("Entrer la liste de préférence des " + n + " pirates");
-                while (n != 0) {
-                    System.out.println("Entrer le nom du pirate");
-                    Scanner sc5 = new Scanner(System.in);
+            }
 
-                    Noeud pirate = monGraph.getNoeud(sc5.nextLine());
-
-                    System.out.println("Entrer les préférences");
-
-                    Scanner sc6 = new Scanner(System.in);
-
-                    String pref = sc6.nextLine();
-
-                    Scanner sc7 = new Scanner(pref);
-
-                    if (pirate.getPreferences().isEmpty()) {
-                        while (sc7.hasNext()) {
-                            pirate.setPreferences(sc7.nextInt());
-                        }
-                        for (int l : pirate.getPreferences()) {
-                            System.out.println(l);
-                        }
-                        n--;
-                    }
+            switch (choice) {
+                case 1:
+                    menu(monGraph);
                     break;
-                }
-            case 3:
-                for (Map.Entry mapentry : monGraph.getHmap().entrySet()) {
+                case 2:
+                    System.out.println("Résolution manuelle");
 
-                    Noeud noeud = (Noeud) mapentry.getValue();
-                    if (noeud.getPreferences().isEmpty()) {
-                        System.out.println("le pirate "+mapentry.getKey() + "n'a pas de liste de préférence");
-                        //Renvoyer vers le menu
+                    solutionNaive(monGraph);
+
+                    for (Pirate pirate : monGraph.getPirates()) {
+                        System.out.println(pirate.getId() + " : " + pirate.getObjectsAttibuated() + "\n");
                     }
-                }
+                    menu2(monGraph);
+                    break;
+                case 3:
+                    saveResult(monGraph);
+                    break;
+                case 4:
+                    System.out.println("\nFin du jeu, merci pour votre participation");
+                    menu = true;
+                    break;
 
-
+            }
         }
-
-
-/*
-        Noeud d = new Noeud("D");
-        Noeud e = new Noeud("E");
-        Noeud f = new Noeud("F");
-
-        Arc de = new Arc(d, e);
-        Arc ef = new Arc(e, f);
-
-        System.out.println("Print nodes /");
-
-        System.out.println(d);
-        System.out.println(e);
-        System.out.println(f);
-
-        System.out.println("Print edges /");
-
-        System.out.println(de);
-        System.out.println(ef);
-
-        System.out.println("Graph /");
-
-
-
-        monGraph.addNoeud(d);
-        monGraph.addNoeud(e);
-        monGraph.addNoeud(f);
-        monGraph.addArc("A", "B");
-        monGraph.addArc("B", "C");
-
-
-        System.out.println(monGraph);*/
-
-
     }
 }
