@@ -1,29 +1,81 @@
 package com.company;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Pirate {
-    private String name;
+    private String id;
+    private LinkedList<Arc> succ;
     private List<Integer> preferences;
-    private  int objectsAttibuated;
+    private int objectsAttibuated;
 
-    public Pirate() {
+
+    public Pirate(String id) {
+        super();
+        this.id = id;
+        this.succ = new LinkedList<Arc>();
+        this.preferences = new ArrayList<>();
+        this.objectsAttibuated = 0;
+
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setPreferences(int pref) {
+        preferences.add(pref);
     }
 
     public List<Integer> getPreferences() {
         return preferences;
     }
 
-    public void setPreferences(List<Integer> preferences) {
-        this.preferences = preferences;
+    @Override
+    public String toString() {
+        return "Pirate{" +
+                "id='" + id + '\'' +
+                ", succ=" + succ +
+                ", preferences=" + preferences +
+                ", objectsAttibuated=" + objectsAttibuated +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Pirate other = (Pirate) obj;
+        if (id != other.id)
+            return false;
+        return true;
+    }
+
+    public boolean hasSuccesseur(String j) {
+
+        for (Arc e : this.succ) if (e.getCible().id.equals(j)) return (true);
+
+        return (false);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+
+    public LinkedList<Arc> getSucc() {
+        return succ;
+    }
+
+
+    public void setSucc(LinkedList<Arc> succ) {
+        this.succ = succ;
     }
 
     public int getObjectsAttibuated() {

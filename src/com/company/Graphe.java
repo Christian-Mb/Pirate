@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Graphe {
-    private LinkedList<Noeud> noeuds;
+    private LinkedList<Pirate> pirates;
     /* This is how to declare HashMap */
-    private HashMap<String, Noeud> hmap;
+    private HashMap<String, Pirate> hmap;
 
 
-    public void addNoeud(Noeud n) {
+    public void addNoeud(Pirate n) {
         // recherche si l'id apparait dans un Noeud de la liste
         // Ajoute le Noeud à la liste sinon
 /*		if (! (this.getNoeuds().contains(n))) {
@@ -27,7 +27,7 @@ public class Graphe {
         // recherche si un Noeud n apparait dans la liste
 
         if (this.getHmap().get(n) == null) {
-            Noeud node = new Noeud(n);
+            Pirate node = new Pirate(n);
             this.getNoeuds().add(node);
             this.getHmap().put(n, node);
         }
@@ -45,9 +45,14 @@ public class Graphe {
                 new Arc(this.getHmap().get(x), this.getHmap().get(y));
         }
 
+        if (this.getHmap().get(y) != null && this.getHmap().get(x) != null) {
+            if (!(this.getHmap().get(y).hasSuccesseur(x)))
+                new Arc(this.getHmap().get(y), this.getHmap().get(x));
+        }
+
     }
 
-    public Noeud getNoeud(String n) {
+    public Pirate getNoeud(String n) {
         //recherche l'élément dans la liste
 
         return (this.getHmap().get(n));
@@ -55,15 +60,15 @@ public class Graphe {
 
     @Override
     public String toString() {
-        Noeud n;
+        Pirate n;
 
         return "Graphe [noeuds=" + getNoeuds() + "]";
     }
 
     public Graphe() {
         super();
-        setNoeuds(new LinkedList<Noeud>());
-        setHmap(new HashMap<String, Noeud>());
+        setNoeuds(new LinkedList<Pirate>());
+        setHmap(new HashMap<String, Pirate>());
     }
 
     private String getCharForNumber(int i) {
@@ -72,30 +77,29 @@ public class Graphe {
 
     public Graphe(int k) {
         super();
-        setNoeuds(new LinkedList<Noeud>());
-        setHmap(new HashMap<String, Noeud>());
+        setNoeuds(new LinkedList<Pirate>());
+        setHmap(new HashMap<String, Pirate>());
 
         for (int i = 0; i < k; i++) {
-            getNoeuds().add(new Noeud(getCharForNumber(i)));
+            getNoeuds().add(new Pirate(getCharForNumber(i)));
             /*Adding elements to HashMap*/
             hmap.put(getCharForNumber(i), getNoeuds().getLast());
         }
     }
 
-
-    public LinkedList<Noeud> getNoeuds() {
-        return noeuds;
+    public LinkedList<Pirate> getNoeuds() {
+        return pirates;
     }
 
-    public void setNoeuds(LinkedList<Noeud> noeuds) {
-        this.noeuds = noeuds;
+    public void setNoeuds(LinkedList<Pirate> pirates) {
+        this.pirates = pirates;
     }
 
-    public HashMap<String, Noeud> getHmap() {
+    public HashMap<String, Pirate> getHmap() {
         return hmap;
     }
 
-    public void setHmap(HashMap<String, Noeud> hmap) {
+    public void setHmap(HashMap<String, Pirate> hmap) {
         this.hmap = hmap;
     }
 
